@@ -182,7 +182,7 @@ def update_title(filepath, new_ssszs_title, new_tzgg_title, new_zsjz_title):
     with open(filepath, 'r', encoding='utf-8') as file:
         file_data = file.read()
 
-        if new_tzgg_title:
+        if new_tzgg_title and new_tzgg_title != OLD_TZGG_TITLE:
             # 更新【通知公告】旧标题
             file_data = re.sub(
                 r"OLD_TZGG_TITLE = '(.*?)'",
@@ -192,7 +192,7 @@ def update_title(filepath, new_ssszs_title, new_tzgg_title, new_zsjz_title):
             )
 
         # 更新【硕士生招生】旧标题
-        if new_ssszs_title:
+        if new_ssszs_title and new_ssszs_title != OLD_SSSZS_TITLE:
             file_data = re.sub(
                 r"OLD_SSSZS_TITLE = '(.*?)'",
                 f"OLD_SSSZS_TITLE = '{new_ssszs_title}'",
@@ -200,7 +200,7 @@ def update_title(filepath, new_ssszs_title, new_tzgg_title, new_zsjz_title):
                 count=1
             )
 
-        if new_zsjz_title:
+        if new_zsjz_title and new_zsjz_title != OLD_ZSJZ_TITLE:
             # 更新【招生简章】旧标题
             file_data = re.sub(
                 r"OLD_ZSJZ_TITLE = '(.*?)'",
