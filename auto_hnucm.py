@@ -1,9 +1,9 @@
 #!/usr/local/bin/python3
 # -*- encoding: utf-8 -*-
 '''
-@Function	: 爬取【湖南中医药大学研究生院】最新招生公告
-@Create-Time: 2022/09/03 01:26:09
-@Author		: https://github.com/shujuecn
+@Function   : 爬取【湖南中医药大学研究生院】最新招生公告
+@Time       : 2022/09/03 01:26:09
+@Author     : https://github.com/shujuecn
 '''
 
 import os
@@ -14,14 +14,17 @@ import requests
 from lxml import etree
 
 
-# 旧【通知公告】标题
-OLD_TZGG_TITLE = '关于2023年博士研究生报考资格审查情况的说明'
-# 旧【硕士生招生】标题
-OLD_SSSZS_TITLE = '湖南中医药大学2023年接收优秀应届本科毕业生免试攻读硕士学位研究生名单公示'
-# 旧【招生简章】标题
-OLD_ZSJZ_TITLE = 'test'
-# 旧【博士生招生】标题
-OLD_BSSZS_TITLE = '湖南中医药大学关于2023年招收在职攻读中医博士专业学位研究生的通知'
+# 最新通知的标题（此文件运行后会自动更新！！！）
+OLD_TITLE = {
+    # 通知公告
+    'tzgg': '关于2023年博士研究生报考资格审查情况的说明',
+    # 硕士生招生
+    'ssszs': '湖南中医药大学2023年接收优秀应届本科毕业生免试攻读硕士学位研究生名单公示',
+    # 招生简章
+    'zsjz': 'test',
+    # 博士生招生
+    'bsszs': '湖南中医药大学关于2023年招收在职攻读中医博士专业学位研究生的通知'
+}
 
 
 def get_html(url):
@@ -70,148 +73,47 @@ def get_notice_info(html):
     return (notice_title, notice_time, notice_url)
 
 
-def hncum_tzgg(code):
+def hnucm_notice(code, notice_type):
     """
-    查询【通知公告】页面相关通知
+    打印个页面的查询结果
     """
-
     if code == 1:
-        print("\033[1;34m查询【通知公告】...\033[0m")
+        if notice_type == 'tzgg':
+            print("\033[1;34m查询【通知公告】...\033[0m")
+            notice_url = "https://yjsy.hnucm.edu.cn/zsxx/tzgg.htm"
+        elif notice_type == 'ssszs':
+            print("\033[1;34m查询【硕士生招生】...\033[0m")
+            notice_url = "https://yjsy.hnucm.edu.cn/zsxx/ssszs.htm"
+        elif notice_type == 'zsjz':
+            print("\033[1;34m查询【招生简章】...\033[0m")
+            notice_url = "https://yjsy.hnucm.edu.cn/zsxx/zsjz.htm"
+        elif notice_type == 'bsszs':
+            print("\033[1;34m查询【博士生招生】...\033[0m")
+            notice_url = "https://yjsy.hnucm.edu.cn/zsxx/bsszs.htm"
+        else:
+            return
 
-        tzgg_url = "https://yjsy.hnucm.edu.cn/zsxx/tzgg.htm"
-        tzgg_html = get_html(tzgg_url)
+        notice_html = get_html(notice_url)
 
-        if tzgg_html:
+        if notice_html:
 
             # 新通知标题、时间、链接
-            tzgg_title, tzgg_time, tzgg_url = get_notice_info(tzgg_html)
+            notice_title, notice_time, notice_url = get_notice_info(notice_html)
 
-            print("最新通知：" + tzgg_title)
-            print("更新日期：" + tzgg_time)
+            print("最新通知：" + notice_title)
+            print("更新日期：" + notice_time)
 
             # 判断置顶通知是否更新
-            if tzgg_title != OLD_TZGG_TITLE:
+            if notice_title != OLD_TITLE[notice_type]:
                 print("查询结果：\033[1;31m%s\033[0m" % "有新通知，请速查看！")
-                print("通知链接：\033[1;31m%s\033[0m" % tzgg_url)
+                print("通知链接：\033[1;31m%s\033[0m" % notice_url)
             else:
                 print("查询结果：\033[1;34m%s\033[0m" % "无新通知！")
 
             print()
-            return tzgg_title
-
+            return notice_title
         else:
             print('获取失败...\n')
-
-    return
-
-
-def hnucm_ssszs(code):
-    """
-    查询【硕士生招生】页面相关通知
-    """
-
-    if code == 1:
-        print("\033[1;34m查询【硕士生招生】...\033[0m")
-
-        ssszs_url = "https://yjsy.hnucm.edu.cn/zsxx/ssszs.htm"
-        ssszs_html = get_html(ssszs_url)
-
-        if ssszs_html:
-
-            # 新通知标题、时间、链接
-            ssszs_title, ssszs_time, ssszs_url = get_notice_info(ssszs_html)
-
-            print("最新通知：" + ssszs_title)
-            print("更新日期：" + ssszs_time)
-
-            # 判断置顶通知是否更新
-            if ssszs_title != OLD_SSSZS_TITLE:
-                print("查询结果：\033[1;31m%s\033[0m" % "有新通知，请速查看！")
-                print("通知链接：\033[1;31m%s\033[0m" % ssszs_url)
-            else:
-                print("查询结果：\033[1;34m%s\033[0m" % "无新通知！")
-
-            print()
-            return ssszs_title
-
-        else:
-            print('获取失败...\n')
-
-    return
-
-
-def hnucm_zsjz(code):
-    '''
-    查询【招生简章】页面相关通知
-    '''
-
-    if code == 1:
-
-        print("\033[1;34m查询【招生简章】...\033[0m")
-
-        # 招生简章
-        zsjz_url = "https://yjsy.hnucm.edu.cn/zsxx/zsjz.htm"
-        zsjz_html = get_html(zsjz_url)
-
-        if zsjz_html:
-
-            # 新通知标题、时间、链接
-            zsjz_title, zsjz_time, zsjz_url = get_notice_info(zsjz_html)
-
-            print("最新通知：" + zsjz_title)
-            print("更新日期：" + zsjz_time)
-
-            # 判断置顶通知是否更新
-            if zsjz_title != OLD_ZSJZ_TITLE:
-                print("查询结果：\033[1;31m%s\033[0m" % "有新通知，请速查看！")
-                print("通知链接：\033[1;31m%s\033[0m" % zsjz_url)
-            else:
-                print("查询结果：\033[1;34m%s\033[0m" % "无新通知！")
-
-            print()
-            return zsjz_title
-
-        else:
-            print('获取失败...\n')
-
-    return
-
-
-def hnucm_bsszs(code):
-    '''
-    查询【招生简章】页面相关通知
-    '''
-
-    if code == 1:
-
-        print("\033[1;34m查询【博士生招生】...\033[0m")
-
-        # 招生简章
-        bsszs_url = "https://yjsy.hnucm.edu.cn/zsxx/bsszs.htm"
-        bsszs_html = get_html(bsszs_url)
-
-        if bsszs_html:
-
-            # 新通知标题、时间、链接
-            bsszs_title, bsszs_time, bsszs_url = get_notice_info(bsszs_html)
-
-            print("最新通知：" + bsszs_title)
-            print("更新日期：" + bsszs_time)
-
-            # 判断置顶通知是否更新
-            if bsszs_title != OLD_BSSZS_TITLE:
-                print("查询结果：\033[1;31m%s\033[0m" % "有新通知，请速查看！")
-                print("通知链接：\033[1;31m%s\033[0m" % bsszs_url)
-            else:
-                print("查询结果：\033[1;34m%s\033[0m" % "无新通知！")
-
-            print()
-            return bsszs_title
-
-        else:
-            print('获取失败...\n')
-
-    return
 
 
 def update_title(**kwargs):
@@ -219,7 +121,10 @@ def update_title(**kwargs):
     自动更新 auto_hnucm.py 中的 old_title
     """
 
+    # 当前文件路径
     filepath = kwargs['current_file_path']
+
+    # 最新通知标题
     new_ssszs_title = kwargs['new_ssszs_title']
     new_tzgg_title = kwargs['new_tzgg_title']
     new_zsjz_title = kwargs['new_zsjz_title']
@@ -229,38 +134,38 @@ def update_title(**kwargs):
     with open(filepath, 'r', encoding='utf-8') as file:
         file_data = file.read()
 
-        if new_tzgg_title and new_tzgg_title != OLD_TZGG_TITLE:
+        if new_tzgg_title and new_tzgg_title != OLD_TITLE['tzgg']:
             # 更新【通知公告】旧标题
             file_data = re.sub(
-                r"OLD_TZGG_TITLE = '(.*?)'",
-                f"OLD_TZGG_TITLE = '{new_tzgg_title}'",
+                r"'tzgg': '(.*?)'",
+                f"'tzgg': '{new_tzgg_title}'",
                 file_data,
                 count=1
             )
 
         # 更新【硕士生招生】旧标题
-        if new_ssszs_title and new_ssszs_title != OLD_SSSZS_TITLE:
+        if new_ssszs_title and new_ssszs_title != OLD_TITLE['ssszs']:
             file_data = re.sub(
-                r"OLD_SSSZS_TITLE = '(.*?)'",
-                f"OLD_SSSZS_TITLE = '{new_ssszs_title}'",
+                r"'ssszs': '(.*?)'",
+                f"'ssszs': '{new_ssszs_title}'",
                 file_data,
                 count=1
             )
 
-        if new_zsjz_title and new_zsjz_title != OLD_ZSJZ_TITLE:
+        if new_zsjz_title and new_zsjz_title != OLD_TITLE['zsjz']:
             # 更新【招生简章】旧标题
             file_data = re.sub(
-                r"OLD_ZSJZ_TITLE = '(.*?)'",
-                f"OLD_ZSJZ_TITLE = '{new_zsjz_title}'",
+                r"'zsjz': '(.*?)'",
+                f"'zsjz': '{new_zsjz_title}'",
                 file_data,
                 count=1
             )
 
-        if new_bsszs_title and new_bsszs_title != OLD_BSSZS_TITLE:
+        if new_bsszs_title and new_bsszs_title != OLD_TITLE['bsszs']:
             # 更新【招生简章】旧标题
             file_data = re.sub(
-                r"OLD_BSSZS_TITLE = '(.*?)'",
-                f"OLD_BSSZS_TITLE = '{new_bsszs_title}'",
+                r"'bsszs': '(.*?)'",
+                f"'bsszs': '{new_bsszs_title}'",
                 file_data,
                 count=1
             )
@@ -270,7 +175,10 @@ def update_title(**kwargs):
         file.write(file_data)
 
 
-def print_decorator(func):
+def print_dotted_lines(func):
+    '''
+    打印分割线
+    '''
 
     @functools.wraps(func)
     def inner(*args, **kwargs):
@@ -282,20 +190,17 @@ def print_decorator(func):
     return inner
 
 
-@print_decorator
+@print_dotted_lines
 def main(**kwargs):
-    """
-    主函数
-    """
 
     # 查询【通知公告】的最新通知
-    tzgg_title = hncum_tzgg(kwargs['tzgg'])
+    tzgg_title = hnucm_notice(kwargs['tzgg'], 'tzgg')
     # 查询【硕士生招生】的最新通知
-    ssszs_title = hnucm_ssszs(kwargs['ssszs'])
+    ssszs_title = hnucm_notice(kwargs['ssszs'], 'ssszs')
     # 查询【招生简章】的最新通知
-    zsjz_title = hnucm_zsjz(kwargs['zsjz'])
+    zsjz_title = hnucm_notice(kwargs['zsjz'], 'zsjz')
     # 查询【博士生招生】的最新通知
-    bsszs_title = hnucm_bsszs(kwargs['bsszs'])
+    bsszs_title = hnucm_notice(kwargs['bsszs'], 'bsszs')
 
     # 更新当前文件中的全局变量
     new_title = {
@@ -310,7 +215,7 @@ def main(**kwargs):
 
 if __name__ == '__main__':
 
-    # 是否开启查询（ 1:开启  0:关闭 ）
+    # 查询开关（1：开启  0：关闭）
     code = {
         'tzgg': 1,      # 通知公告
         'ssszs': 1,     # 硕士生招生
